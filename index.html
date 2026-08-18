@@ -9,26 +9,32 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body, #map { width: 100%; height: 100%; }
 
-        /* ---------- КНОПКА-БУРГЕР (показывается только на мобильных) ---------- */
+        /* ---------- БУРГЕР-КНОПКА (синяя, справа вверху) ---------- */
         .toggle-panel-btn {
-            position: absolute;
+            position: fixed;
             top: 20px;
-            left: 20px;
-            z-index: 1001;
-            background: rgba(45,50,55,0.85);
-            backdrop-filter: blur(8px);
+            right: 20px;
+            z-index: 2000;
+            background: #007bff;
             border: none;
             color: #fff;
-            font-size: 28px;
-            padding: 10px 16px;
-            border-radius: 30px;
+            font-size: 32px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
             cursor: pointer;
-            display: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.2s;
+            display: none; /* показываем только на мобильных */
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
         }
         .toggle-panel-btn:hover {
-            background: rgba(45,50,55,0.95);
+            background: #0056b3;
+        }
+        .toggle-panel-btn:active {
+            transform: scale(0.95);
         }
 
         /* ---------- СТЕКЛЯННАЯ ПАНЕЛЬ ---------- */
@@ -63,35 +69,68 @@
         }
         .disclaimer { font-size: 10px; text-align: center; margin-top: 12px; opacity: 0.7; }
 
-        /* Блок федераций */
+        /* ---------- БЛОК ФЕДЕРАЦИЙ (крупная заметная кнопка) ---------- */
         .federations-block {
             margin-top: 16px;
             border-top: 1px solid rgba(255,255,255,0.15);
             padding-top: 14px;
         }
         .federations-toggle {
-            background: none; border: none; color: #86d46b; font-size: 14px;
-            font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;
-            padding: 6px 0; width: 100%; text-align: left;
+            background: #86d46b;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a3c2c;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
         }
-        .federations-toggle:hover { color: #a8e68c; }
-        .federations-toggle .arrow { transition: transform 0.25s; display: inline-block; }
-        .federations-toggle.open .arrow { transform: rotate(90deg); }
+        .federations-toggle:hover {
+            background: #6dbd5a;
+        }
+        .federations-toggle:active {
+            transform: scale(0.98);
+        }
+        .federations-toggle .arrow {
+            transition: transform 0.25s;
+            display: inline-block;
+            font-size: 20px;
+        }
+        .federations-toggle.open .arrow {
+            transform: rotate(90deg);
+        }
+        .federations-toggle .fed-count {
+            font-weight: 400;
+            font-size: 16px;
+            background: rgba(0,0,0,0.15);
+            padding: 0 12px;
+            border-radius: 30px;
+        }
 
         .federations-list {
-            max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
         }
         .federations-list.open {
-            max-height: 600px; overflow-y: auto;
+            max-height: 600px;
+            overflow-y: auto;
         }
 
         .federation-item {
             background: rgba(255,255,255,0.08);
             border-radius: 16px;
             padding: 14px 16px;
-            margin-bottom: 10px;
+            margin-top: 10px;
             transition: background 0.2s;
-            cursor: default;
         }
         .federation-item:hover {
             background: rgba(255,255,255,0.15);
@@ -111,11 +150,14 @@
             display: flex; flex-wrap: wrap; gap: 8px 16px;
         }
         .federation-item .f-contacts a {
-            color: #86d46b; text-decoration: none;
+            color: #86d46b;
+            text-decoration: none;
         }
-        .federation-item .f-contacts a:hover { text-decoration: underline; }
+        .federation-item .f-contacts a:hover {
+            text-decoration: underline;
+        }
 
-        /* Балун */
+        /* ---------- БАЛУН ---------- */
         .balloon-card {
             position: relative;
             min-width: 400px; max-width: 460px;
@@ -167,7 +209,12 @@
         /* ---------- АДАПТИВ ДЛЯ ТЕЛЕФОНОВ ---------- */
         @media (max-width: 550px) {
             .toggle-panel-btn {
-                display: block;
+                display: flex;
+                top: 16px;
+                right: 16px;
+                width: 48px;
+                height: 48px;
+                font-size: 26px;
             }
             .glass-panel {
                 width: calc(100% - 20px);
@@ -210,6 +257,10 @@
                 right: 10px;
             }
 
+            .federations-toggle {
+                font-size: 16px;
+                padding: 12px 16px;
+            }
             .federation-item { padding: 10px 12px; }
             .federation-item .f-name { font-size: 13px; }
             .federation-item .f-sports span { font-size: 10px; padding: 2px 8px; }
@@ -220,7 +271,7 @@
 <body>
 <div id="map"></div>
 
-<!-- Кнопка-бургер для показа/скрытия панели -->
+<!-- Бургер-кнопка (синяя, справа вверху) -->
 <button id="togglePanelBtn" class="toggle-panel-btn" aria-label="Показать меню">☰</button>
 
 <div class="glass-panel" id="mainPanel">
@@ -245,7 +296,8 @@
 
     <div class="federations-block">
         <button id="federationsToggle" class="federations-toggle">
-            <span class="arrow">▶</span> Федерации <span id="fedCount" style="font-weight:400; color:#a0b8b0; margin-left:6px;"></span>
+            <span class="arrow">▶</span> Федерации
+            <span class="fed-count" id="fedCount">0</span>
         </button>
         <div id="federationsList" class="federations-list"></div>
     </div>
@@ -269,7 +321,7 @@
         'kudo':'Кудо','kyokushin':'Киокушин','cycling':'Велоспорт','rolling':'Ролики','extreme-sports':'Экстрим'
     };
 
-    // ---------- ПОЛНЫЙ МАССИВ ОРГАНИЗАЦИЙ (ВСЕ 104 ОБЪЕКТА) ----------
+    // ---------- ПОЛНЫЙ МАССИВ ОРГАНИЗАЦИЙ (104 объекта) ----------
     const features = [
         // ===== МУНИЦИПАЛЬНЫЕ =====
         {type:"Feature",id:"mun1",geometry:{type:"Point",coordinates:[46.953131,142.758209]},properties:{name:"МАУ ДО СШОР по греко-римской борьбе города Южно-Сахалинска",level:"local",sportType:["taekwondo","wrestling","judo"],phone:"+7 (4242) 72-00-68",email:"",website:"http://www.xn--80abf7bkbdf1bw.xn--p1acf/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Горького 7/1",president:"Глухов В.А.",position:"Директор"}},
@@ -413,10 +465,12 @@
     const organizations = allObjects.filter(obj => obj.type !== 'social');
     const federations = allObjects.filter(obj => obj.type === 'social');
 
-    // ---------- БАЛУН С КНОПКОЙ ЗАКРЫТИЯ ----------
+    // ---------- БАЛУН С КНОПКОЙ ЗАКРЫТИЯ И АКТИВНЫМ ТЕЛЕФОНОМ ----------
     function getBalloonContent(org) {
         const sportTags = org.sports.map(s => `<span class="sports-badge">${SPORT_TYPES[s] || s}</span>`).join('');
         const websiteLink = org.website ? `<a href="${org.website}" target="_blank">${org.websiteText}</a>` : '—';
+        // телефон в ссылку tel:
+        const phoneLink = org.phone && org.phone !== '—' ? `<a href="tel:${org.phone.replace(/[^0-9+]/g, '')}">${org.phone}</a>` : org.phone;
 
         let typeLabel = 'Муниципальная';
         let typeClass = 'local';
@@ -431,7 +485,7 @@
                 </div>
                 <div class="balloon-body">
                     <div class="info-row"><div class="info-icon">📍</div><div class="info-text">${org.address}</div></div>
-                    <div class="info-row"><div class="info-icon">📞</div><div class="info-text">${org.phone}</div></div>
+                    <div class="info-row"><div class="info-icon">📞</div><div class="info-text">${phoneLink}</div></div>
                     <div class="info-row"><div class="info-icon">✉️</div><div class="info-text">${org.email}</div></div>
                     <div class="info-row"><div class="info-icon">🌐</div><div class="info-text">${websiteLink}</div></div>
                     ${org.hours && org.hours !== 'не указаны' ? `<div class="info-row"><div class="info-icon">🕒</div><div class="info-text">${org.hours}</div></div>` : ''}
@@ -514,16 +568,13 @@
 
         let currentSearchText = '';
 
-        // --- Бургер-кнопка для скрытия/показа панели ---
+        // --- Бургер-кнопка ---
         toggleBtn.addEventListener('click', function() {
             panel.classList.toggle('hidden');
-            if (panel.classList.contains('hidden')) {
-                toggleBtn.textContent = '☰';
-            } else {
-                toggleBtn.textContent = '✕';
-            }
+            toggleBtn.textContent = panel.classList.contains('hidden') ? '☰' : '✕';
         });
 
+        // --- Рендер списка федераций с активными телефонами ---
         function renderFederationsList(feds) {
             if (feds.length === 0) {
                 fedList.innerHTML = '<div style="color:#aaa; padding:8px 0; font-size:13px;">Федераций не найдено</div>';
@@ -533,12 +584,13 @@
             feds.forEach(fed => {
                 const sportTags = fed.sports.map(s => `<span>${SPORT_TYPES[s] || s}</span>`).join('');
                 const websiteLink = fed.website ? `<a href="${fed.website}" target="_blank">${fed.websiteText}</a>` : '—';
+                const phoneLink = fed.phone && fed.phone !== '—' ? `<a href="tel:${fed.phone.replace(/[^0-9+]/g, '')}">${fed.phone}</a>` : fed.phone;
                 html += `
                     <div class="federation-item">
                         <div class="f-name">${fed.name}</div>
                         <div class="f-sports">${sportTags}</div>
                         <div class="f-contacts">
-                            <span>📞 ${fed.phone}</span>
+                            <span>📞 ${phoneLink}</span>
                             <span>✉️ ${fed.email}</span>
                             <span>🌐 ${websiteLink}</span>
                         </div>
@@ -570,7 +622,7 @@
                 return nameMatch && sportMatch;
             });
             renderFederationsList(filteredFeds);
-            fedCountEl.innerText = `(${filteredFeds.length})`;
+            fedCountEl.innerText = filteredFeds.length;
         }
 
         function onSearchInput() {
@@ -602,6 +654,7 @@
             });
         }
 
+        // Аккордеон для федераций – открываем/закрываем
         fedToggle.addEventListener('click', function() {
             const isOpen = fedList.classList.toggle('open');
             fedToggle.classList.toggle('open');
@@ -613,8 +666,9 @@
         resetBtn.addEventListener('click', resetAll);
         populateSportFilter();
 
+        // Первичная загрузка
         renderFederationsList(federations);
-        fedCountEl.innerText = `(${federations.length})`;
+        fedCountEl.innerText = federations.length;
         orgCountEl.innerText = `Найдено на карте: ${allPlacemarks.length}`;
     });
 </script>
