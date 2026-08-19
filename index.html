@@ -25,7 +25,7 @@
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             transition: background 0.2s, transform 0.2s;
-            display: none; /* скрыта на десктопе */
+            display: none;
             align-items: center;
             justify-content: center;
             line-height: 1;
@@ -380,7 +380,7 @@
 </div>
 
 <script>
-    // ---------- ЕДИНЫЙ ОБРАБОТЧИК БУРГЕРА (только для мобильных) ----------
+    // ---------- ЕДИНЫЙ НАДЁЖНЫЙ ОБРАБОТЧИК БУРГЕРА (для мобильных) ----------
     (function() {
         const toggleBtn = document.getElementById('togglePanelBtn');
         const panel = document.getElementById('mainPanel');
@@ -389,10 +389,10 @@
                 e.preventDefault();
                 panel.classList.toggle('hidden');
                 toggleBtn.textContent = panel.classList.contains('hidden') ? '☰' : '✕';
-                // Для отладки (можно убрать)
-                console.log('Панель скрыта:', panel.classList.contains('hidden'));
+                // Небольшая вибрация для отклика (опционально)
+                if (navigator.vibrate) navigator.vibrate(20);
             }
-            // Поддержка и клика, и тача
+            // Обработка и клика, и тача (для мобильных)
             toggleBtn.addEventListener('click', togglePanel);
             toggleBtn.addEventListener('touchstart', togglePanel, { passive: false });
         }
@@ -413,14 +413,7 @@
         'kudo':'Кудо','kyokushin':'Киокушин','cycling':'Велоспорт','rolling':'Ролики','extreme-sports':'Экстрим'
     };
 
-    // ---------- ДАННЫЕ ОРГАНИЗАЦИЙ (полный массив) ----------
-    // (здесь идёт весь массив features – он такой же, как в вашем файле, я не буду его дублировать для краткости,
-    // но в реальном файле он должен быть полностью. Вы можете скопировать его из вашего текущего файла или из предыдущего ответа.
-    // Для экономии места я оставлю заглушку, но вы должны заменить её на свои данные.
-    // ВАЖНО: в финальном коде массив features должен быть полным.
-    // Поскольку я не могу повторить все 100+ объектов из-за ограничения длины, я вставлю ссылку на полный массив в комментарии.
-    // Но для работоспособности примера я добавлю один тестовый объект.
-    // Вы должны заменить этот массив на свой полный.
+    // ---------- ДАННЫЕ ОРГАНИЗАЦИЙ (полный массив из вашего файла) ----------
     const features = [
         // ===== МУНИЦИПАЛЬНЫЕ =====
         {type:"Feature",id:"mun1",geometry:{type:"Point",coordinates:[46.953131,142.758209]},properties:{name:"МАУ ДО СШОР по греко-римской борьбе города Южно-Сахалинска",level:"local",sportType:["taekwondo","wrestling","judo"],phone:"+7 (4242) 72-00-68",email:"",website:"http://www.xn--80abf7bkbdf1bw.xn--p1acf/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Горького 7/1",president:"Глухов В.А.",position:"Директор"}},
@@ -1024,19 +1017,8 @@
             filterOrgs();
         }, 100);
 
-        // ---------- БУРГЕР-КНОПКА ----------
-        const toggleBtn = document.getElementById('togglePanelBtn');
-        const panel = document.getElementById('mainPanel');
-        if (toggleBtn && panel) {
-            if (!toggleBtn._listenerAdded) {
-                toggleBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    panel.classList.toggle('hidden');
-                    toggleBtn.textContent = panel.classList.contains('hidden') ? '☰' : '✕';
-                });
-                toggleBtn._listenerAdded = true;
-            }
-        }
+        // ---------- БУРГЕР-КНОПКА (дублирующий код УДАЛЁН) ----------
+        // Обработчик бургера теперь только один — выше, вне ymaps.ready
 
         // Принудительно показываем вкладку организаций при загрузке
         switchTab('orgs');
