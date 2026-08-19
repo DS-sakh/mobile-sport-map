@@ -25,11 +25,11 @@
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             transition: background 0.2s, transform 0.2s;
-            display: none; /* скрыта на десктопе */
+            display: none;
             align-items: center;
             justify-content: center;
             line-height: 1;
-            touch-action: manipulation; /* улучшает отклик на тач */
+            touch-action: manipulation;
         }
         .toggle-panel-btn:hover { background: #0056b3; }
         .toggle-panel-btn:active { transform: scale(0.95); }
@@ -102,6 +102,63 @@
             font-size: 13px; border-top: 1px solid rgba(255,255,255,0.1);
         }
         .disclaimer { font-size: 10px; text-align: center; margin-top: 12px; opacity: 0.7; }
+
+        /* ---------- СПИСОК ОРГАНИЗАЦИЙ ---------- */
+        .org-list-container {
+            margin-top: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 10px;
+        }
+        .org-list-container::-webkit-scrollbar { width: 4px; }
+        .org-list-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+
+        .org-list-item {
+            background: rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .org-list-item:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        .org-list-item .org-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: #fff;
+        }
+        .org-list-item .org-address {
+            font-size: 11px;
+            color: #b0c8c0;
+            margin: 2px 0 4px;
+        }
+        .org-list-item .org-phone {
+            font-size: 11px;
+            color: #86d46b;
+        }
+        .org-list-item .org-phone a {
+            color: #86d46b;
+            text-decoration: none;
+        }
+        .org-list-item .org-phone a:hover {
+            text-decoration: underline;
+        }
+        .org-list-item .org-sports {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .org-list-item .org-sports span {
+            background: rgba(255,255,255,0.15);
+            padding: 1px 8px;
+            border-radius: 30px;
+            font-size: 10px;
+            color: #d4e8d0;
+        }
 
         /* ---------- БЛОК ФЕДЕРАЦИЙ ---------- */
         .federations-block {
@@ -213,7 +270,7 @@
         /* ---------- АДАПТИВ ДЛЯ ТЕЛЕФОНОВ ---------- */
         @media (max-width: 550px) {
             .toggle-panel-btn {
-                display: flex; /* появляется только на мобильных */
+                display: flex;
                 top: 16px;
                 right: 16px;
                 width: 48px;
@@ -237,6 +294,7 @@
             .glass-sub { font-size: 0.75rem; margin-bottom: 1rem; }
             .glass-input, .glass-select { padding: 10px 14px; font-size: 13px; margin-bottom: 10px; }
             .reset-btn { padding: 10px; font-size: 14px; }
+            .org-list-container { max-height: 200px; }
             .balloon-card { min-width: 0; width: 90vw; max-width: 340px; border-radius: 20px; margin: 0 auto; }
             .balloon-header { padding: 12px 16px; }
             .balloon-header h3 { font-size: 15px; }
@@ -287,6 +345,9 @@
         <button id="resetBtn" class="reset-btn">Сбросить всё</button>
         <div id="orgCount" class="org-count">Найдено на карте: 0</div>
 
+        <!-- НОВЫЙ БЛОК: СПИСОК ОРГАНИЗАЦИЙ -->
+        <div id="orgList" class="org-list-container"></div>
+
         <div class="federations-block">
             <button id="federationsToggle" class="federations-toggle">
                 <span class="arrow">▶</span> Федерации
@@ -334,7 +395,7 @@
 
     // ---------- СЛОВАРЬ ВИДОВ СПОРТА ----------
     const SPORT_TYPES = {
-        'health':'Оздоровительная гимнастика','gym':'Тренажерный зал','crossfit':'Кроссфит','wrestling':'Спортивная борьба','judo':'Дзюдо',
+        'health':'Оздоровительная гимнастика','billiards':'Бильярд','chess':'Шахматы','handball':'Гандбол','gym':'Тренажерный зал','yoga':'Йога','crossfit':'Кроссфит','wrestling':'Спортивная борьба','judo':'Дзюдо',
         'taekwondo':'Тхэквондо','pool':'Бассейн','gymnastics':'Художественная гимнастика','football':'Футбол','volleyball':'Волейбол',
         'basketball':'Баскетбол','fitness':'Фитнес','hockey':'Хоккей','badminton':'Бадминтон','horsing':'Верховая езда','table tennis':'Настольный теннис',
         'shooting':'Стрелковые','tennis':'Теннис','fencing':'Фехтование','karate':'Каратэ','kio':'Киокусинкай','snowboarding':'Сноуборд','Skiing':'Горные лыжи',
@@ -342,18 +403,20 @@
         'ski r':'Лыжные гонки','biathlon':'Биатлон','ski jumping':'Прыжки с трамплина','curling':'Кёрлинг','athletics':'Лёгкая атлетика',
         'airplane':'Самолётный спорт','parachuting':'Парашютный спорт','motorcycle':'Мотоспорт','aeromodelling':'Авиамоделизм','organization':'Организация мероприятий',
         'bat':'Батут','go':'Го','backgammon':'Нарды','painball':'Пейнтбол','rugby':'Регби','airsoft':'Страйкбол','urban':'Городошный спорт',
-        'grappling':'Грепплинг','breik':'Брейк-данс','dance':'Танцы','yoga':'Йога','swimming':'Плавание','sambo':'Самбо','kendo':'Кендо','mma':'ММА',
+        'grappling':'Грепплинг','breik':'Брейк-данс','dance':'Танцы','swimming':'Плавание','sambo':'Самбо','kendo':'Кендо','mma':'ММА',
         'pankr':'Панкратион','fight':'Рукопашный бой','savat':'Сават','ssireum':'Ссирым','aikido':'Айкидо','kor':'Борьба корэш','jujutsu':'Джиу-джитсу',
         'kudo':'Кудо','kyokushin':'Киокушин','cycling':'Велоспорт','rolling':'Ролики','extreme-sports':'Экстрим'
     };
 
-    // ---------- ДАННЫЕ ОРГАНИЗАЦИЙ (104 объекта) ----------
+    // ---------- ДАННЫЕ ОРГАНИЗАЦИЙ ----------
     const features = [
         // ===== МУНИЦИПАЛЬНЫЕ =====
         {type:"Feature",id:"mun1",geometry:{type:"Point",coordinates:[46.953131,142.758209]},properties:{name:"МАУ ДО СШОР по греко-римской борьбе города Южно-Сахалинска",level:"local",sportType:["taekwondo","wrestling","judo"],phone:"+7 (4242) 72-00-68",email:"",website:"http://www.xn--80abf7bkbdf1bw.xn--p1acf/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Горького 7/1",president:"Глухов В.А.",position:"Директор"}},
         {type:"Feature",id:"mun2",geometry:{type:"Point",coordinates:[47.050627,142.723910]},properties:{name:"МАУ ДО СШОР по греко-римской борьбе города Южно-Сахалинска",level:"local",sportType:["taekwondo","wrestling","judo"],phone:"+7 (4242) 72-00-68",email:"",website:"http://www.xn--80abf7bkbdf1bw.xn--p1acf/",websiteText:"Официальный сайт",address:"пл.р. Ново-Александровск, пер. Александра Матросова 13",president:"Глухов В.А.",position:"Директор"}},
         {type:"Feature",id:"mun3",geometry:{type:"Point",coordinates:[46.960414,142.754864]},properties:{name:"МАУ ДО СШ по плаванью города Южно-Сахалинска",level:"local",sportType:["pool","gymnastics"],phone:"+7 (4242) 22-79-65",email:"swimmingschool65@mail.ru",website:"https://swimming-school.yuzhno-sakh.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, Коммунистический проспект 3",president:"Завязкина Е.И.",position:"Директор"}},
         {type:"Feature",id:"mun4",geometry:{type:"Point",coordinates:[46.952782,142.723578]},properties:{name:"МАУ Спорт",level:"local",sportType:["football","volleyball","basketball","fitness"],phone:"+7 (4242) 51-54-36",email:"sportsakh@mail.ru",website:"https://mausport.yuzhno-sakh.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Деповская 1",president:"Каркула Э.Н.",position:"Директор"}},
+        {type:"Feature",id:"mun12",geometry:{type:"Point",coordinates:[47.017796,142.713582]},properties:{name:"МАУ Спорт",level:"local",sportType:["football","volleyball","basketball","fitness"],phone:"+7 (4242) 51-54-36",email:"sportsakh@mail.ru",website:"https://mausport.yuzhno-sakh.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Дружбы 73",president:"Каркула Э.Н.",position:"Директор"}},
+        {type:"Feature",id:"mun13",geometry:{type:"Point",coordinates:[47.054845,142.731170]},properties:{name:"МАУ Спорт",level:"local",sportType:["football","volleyball","basketball","fitness"],phone:"+7 (4242) 51-54-36",email:"sportsakh@mail.ru",website:"https://mausport.yuzhno-sakh.ru/",websiteText:"Официальный сайт",address:"пл. р. Ново-Александровск, Железнодорожный пер. 12/1",president:"Каркула Э.Н.",position:"Директор"}},
         {type:"Feature",id:"mun5",geometry:{type:"Point",coordinates:[46.933754,142.733749]},properties:{name:"МАУ Спортивный город",level:"local",sportType:["football","hockey","badminton","volleyball","basketball","fitness","horsing","table tennis"],phone:"+7 (4242) 51-54-36",email:"sportgorod@bk.ru",website:"https://sportgorod.yuzhno-sakh.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Ленина 376",president:"Харченко К.И.",position:"Директор"}},
         {type:"Feature",id:"mun6",geometry:{type:"Point",coordinates:[46.962182,142.735656]},properties:{name:"МБУ ДО СШ игровых видов спорта г.Южно-Сахалинска",level:"local",sportType:["basketball","shooting","tennis","table tennis","hockey"],phone:"+7 (4242) XX-XX-XX",email:"dussh_ivs@mail.ru",website:"https://sakhsportschool.ru",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Курильская, 41",president:"Куряев А.Р.",position:"Директор"}},
         {type:"Feature",id:"mun7",geometry:{type:"Point",coordinates:[46.865266,142.875698]},properties:{name:"МАУ Дом культуры «Электрон»",level:"local",sportType:["health"],phone:"+7 (4242) 795-141 (доб.202)",email:"dkelektron@yandex.ru",website:"https://dk-elektron.yuzhno-sakh.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, жилой квартал Весточка, 2",president:"Сапрыкин Константин Леонидович",position:"Директор"}},
@@ -365,17 +428,21 @@
         {type:"Feature",id:"obl1",geometry:{type:"Point",coordinates:[46.935751,142.758965]},properties:{name:"Автономная некоммерческая организация «Профессиональный спортивный клуб «Сахалин»",level:"social",sportType:["football"],phone:"+7 (4242) 55-62-55",email:"psksakhalin@mail.ru",website:"https://oneteamsakhalin.com/all-news",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, улица Алексея Максимовича Горького, 29",president:"Стерничук Николай Николаевич",position:"Директор"}},
         {type:"Feature",id:"obl2",geometry:{type:"Point",coordinates:[46.953487,142.763129]},properties:{name:"Областное автономное учреждение «Спортивно-туристический комплекс «Горный воздух»",level:"regional",sportType:["snowboarding","Skiing","downhill"],phone:"+7 (4242) 51-11-10",email:"info@ski-gv.ru",website:"https://ski-gv.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, Горнолыжная улица, 3",president:"Марченко Александр Петрович",position:"Директор"}},
         {type:"Feature",id:"obl3",geometry:{type:"Point",coordinates:[46.950906,142.730261]},properties:{name:"Государственное бюджетное учреждение дополнительного образования «Спортивная школа восточных видов единоборств Сахалинской области»",level:"regional",sportType:["fencing","karate","kio"],phone:"+7 (4242) 43-10-30",email:"karate@sakhsport.ru",website:"https://vve.sakhsport.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, улица Ленина, 254В",president:"Ким Ден Тхе (Леонид Александрович)",position:"Директор"}},
-        {type:"Feature",id:"obl5",geometry:{type:"Point",coordinates:[46.966704,142.738258]},properties:{name:"Государственное бюджетное учреждение дополнительного образования «Спортивная школа восточных видов единоборств Сахалинской области»",level:"regional",sportType:["fencing","karate","kio"],phone:"+7 (4242) 43-10-30",email:"karate@sakhsport.ru",website:"https://vve.sakhsport.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, проспект Мира, 70",president:"Ким Ден Тхе (Леонид Александрович)",position:"Директор"}},
+        {type:"Feature",id:"obl4a",geometry:{type:"Point",coordinates:[46.966901,142.738168]},properties:{name:"Государственное бюджетное учреждение дополнительного образования «Спортивная школа восточных видов единоборств Сахалинской области» (отделение)",level:"regional",sportType:["fencing","karate","kio"],phone:"+7 (4242) 43-10-30",email:"karate@sakhsport.ru",website:"https://vve.sakhsport.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, улица Мира, 70",president:"Ким Ден Тхе (Леонид Александрович)",position:"Директор"}},
         {type:"Feature",id:"obl4",geometry:{type:"Point",coordinates:[46.909022,142.744831]},properties:{name:"Областное государственное автономное учреждение дополнительного образования «Спортивная школа водных видов спорта»",level:"regional",sportType:["pool","gym"],phone:"+7 (4242) 55-67-76",email:"ms.ogausshvvs@sakhalin.gov.ru",website:"https://aqua-sakh.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, проспект Мира, 470",president:"Мелешков Сергей Юрьевич",position:"Директор"}},
+        {type:"Feature",id:"obl4b",geometry:{type:"Point",coordinates:[46.962150,142.748791]},properties:{name:"Областное государственное автономное учреждение дополнительного образования «Спортивная школа водных видов спорта» (отделение)",level:"regional",sportType:["pool","gym"],phone:"+7 (4242) 55-67-76",email:"ms.ogausshvvs@sakhalin.gov.ru",website:"https://aqua-sakh.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Комсомольская, 137",president:"Мелешков Сергей Юрьевич",position:"Директор"}},
         {type:"Feature",id:"obl5",geometry:{type:"Point",coordinates:[46.935882,142.759456]},properties:{name:"Областное государственное автономное учреждение дополнительного образования «Спортивная школа «Кристалл»",level:"regional",sportType:["hockey","gym","box","f skating","weightlifting","kickboxing"],phone:"+7 (4242) 24-01-50",email:"ms.ogausshk@sakhalin.gov.ru",website:"https://ikristall.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, улица Алексея Максимовича Горького, 29",president:"Мелешков Сергей Юрьевич",position:"Директор"}},
         {type:"Feature",id:"obl6",geometry:{type:"Point",coordinates:[46.953434,142.760418]},properties:{name:"Государственное бюджетное учреждение дополнительного образования «Спортивная школа по волейболу»",level:"regional",sportType:["volleyball"],phone:"+7 (4242) 24-88-55",email:"elvary-sakhalin@mail.ru",website:"https://sakh-volley.sakhalin.gov.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Алексея Максимовича Горького, 7/3",president:"Кирсанов Сергей Александрович",position:"Директор"}},
         {type:"Feature",id:"obl7",geometry:{type:"Point",coordinates:[46.951088,142.743261]},properties:{name:"Государственное бюджетное учреждение дополнительного образования «Спортивная школа самбо и дзюдо»",level:"regional",sportType:["judo","sambo"],phone:"+7 (4242) 43-64-52",email:"shkola.jsv@mail.ru",website:"https://shkola-jsv.shl.sportsng.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, Проспект Победы, д.50 - А",president:"Задорожный Эдуард Вячеславович",position:"Директор"}},
         {type:"Feature",id:"obl8",geometry:{type:"Point",coordinates:[46.951849,142.761354]},properties:{name:"Областное государственное автономное учреждение дополнительного образования «Спортивная школа «Сахалин»",level:"regional",sportType:["football","gymnastics"],phone:"+7 (4242) 72-03-30",email:"ms.ogausshs@sakhalin.gov.ru",website:"https://fcsakh.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, улица Алексея Максимовича Горького, 7",president:"Крючков Евгений Васильевич",position:"Директор"}},
         {type:"Feature",id:"obl9",geometry:{type:"Point",coordinates:[46.953108,142.762475]},properties:{name:"Государственное автономное учреждение дополнительного образования «Спортивная школа олимпийского резерва по горнолыжному спорту и сноуборду»",level:"regional",sportType:["snowboarding","Skiing"],phone:"+7 (4242) 55-91-91",email:"Sakh-alpineski@mail.ru",website:"https://snow65.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, улица Алексея Максимовича Горького, 7/4",president:"БЫКОВ ДМИТРИЙ ЛЕОНИДОВИЧ",position:"Директор"}},
         {type:"Feature",id:"obl10",geometry:{type:"Point",coordinates:[46.967851,142.762484]},properties:{name:"Государственное автономное учреждение дополнительного образования «Спортивная школа олимпийского резерва зимних видов спорта»",level:"regional",sportType:["ski r","biathlon","ski jumping","curling","shooting"],phone:"+7 (4242) 73-45-74",email:"sakhalin@sshorzvs.ru",website:"https://skisakhalin.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, Венская ул., 5",president:"Шамсутдинов Михаил Азатович",position:"Директор"}},
+        {type:"Feature",id:"obl10a",geometry:{type:"Point",coordinates:[46.938606,142.763231]},properties:{name:"Государственное автономное учреждение дополнительного образования «Спортивная школа олимпийского резерва зимних видов спорта» (отделение)",level:"regional",sportType:["ski r","biathlon","ski jumping","curling","shooting"],phone:"+7 (4242) 73-45-74",email:"sakhalin@sshorzvs.ru",website:"https://skisakhalin.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Алексея Максимовича Горького, 25А",president:"Шамсутдинов Михаил Азатович",position:"Директор"}},
         {type:"Feature",id:"obl11",geometry:{type:"Point",coordinates:[46.952106,142.761307]},properties:{name:"Государственное бюджетное учреждение дополнительного образования «Спортивная школа олимпийского резерва летних видов спорта им. заслуженного тренера РСФСР Э.М.Комнацкого»",level:"regional",sportType:["athletics"],phone:"+7 (4242) 55-95-55",email:"ms.lvs@sakhalin.gov.ru",website:"https://lvs65.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Алексея Максимовича Горького, 7",president:"ВЛАСОВ СЕРГЕЙ МИХАЙЛОВИЧ",position:"Директор"}},
+        {type:"Feature",id:"obl11a",geometry:{type:"Point",coordinates:[46.928108,142.760569]},properties:{name:"Государственное бюджетное учреждение дополнительного образования «Спортивная школа олимпийского резерва летних видов спорта им. заслуженного тренера РСФСР Э.М.Комнацкого» (отделение)",level:"regional",sportType:["athletics"],phone:"+7 (4242) 55-95-55",email:"ms.lvs@sakhalin.gov.ru",website:"https://lvs65.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Алексея Максимовича Горького, 39",president:"ВЛАСОВ СЕРГЕЙ МИХАЙЛОВИЧ",position:"Директор"}},
         {type:"Feature",id:"obl12",geometry:{type:"Point",coordinates:[46.960698,142.732426]},properties:{name:"Областное государственное автономное учреждение «Центр спортивной подготовки Сахалинской области»",level:"regional",sportType:["organization"],phone:"+7 (4242) 67-17-17",email:"ogaucsp@sakhalin.gov.ru",website:"https://lvs65.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, Хабаровская ул., 49",president:"Никонов Алексей Юрьевич",position:"Директор"}},
         {type:"Feature",id:"obl13",geometry:{type:"Point",coordinates:[46.948439,142.719320]},properties:{name:"Областное государственное автономное учреждение дополнительного образования «Спортивная школа по техническим видам спорта»",level:"regional",sportType:["airplane","shooting","parachuting","motorcycle","horsing","aeromodelling"],phone:"+7 (4242) 45-80-20",email:"ctvs@sctvs.ru",website:"https://xn--b1a4abp.xn--p1ai/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, пр-т Победы, д.132.",president:"ТРЕТЬЯКОВ ДМИТРИЙ ВЛАДИМИРОВИЧ",position:"Директор"}},
+        {type:"Feature",id:"obl13a",geometry:{type:"Point",coordinates:[46.967727,142.761503]},properties:{name:"Областное государственное автономное учреждение дополнительного образования «Спортивная школа по техническим видам спорта» (отделение)",level:"regional",sportType:["airplane","shooting","parachuting","motorcycle","horsing","aeromodelling"],phone:"+7 (4242) 45-80-20",email:"ctvs@sctvs.ru",website:"https://xn--b1a4abp.xn--p1ai/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Венская, 7",president:"ТРЕТЬЯКОВ ДМИТРИЙ ВЛАДИМИРОВИЧ",position:"Директор"}},
         // ===== ЧАСТНЫЕ =====
         {type:"Feature",id:"ch1",geometry:{type:"Point",coordinates:[46.937359,142.738544]},properties:{name:"X-Fit",level:"private",sportType:["pool","gym"],phone:"+7 (8) 45-80-20",email:"hotline@xfit.ru",website:"https://www.xfit.ru/club/yuzhno-sakhalinsk/xfit-yuzhno-sakhalinsk/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. А.О. Емельянова, 35А, корп. 2"}},
         {type:"Feature",id:"ch2",geometry:{type:"Point",coordinates:[46.962716,142.759295]},properties:{name:"Гидрострой",level:"private",sportType:["tennis","gym"],phone:"+7 (4242) 39-13-37",email:"gsport@gidrostroy.com",website:"https://www.gsport.club/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, Алтайский пер., 11"}},
@@ -398,6 +465,32 @@
         {type:"Feature",id:"ch19",geometry:{type:"Point",coordinates:[46.954129,142.793368]},properties:{name:"Прорайдер",level:"private",sportType:["snowboarding","Skiing"],phone:"+7 (995) 108-68-86",email:"",website:"https://proriders.pro/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, территория Горнолыжный комплекс Горный воздух, 1"}},
         {type:"Feature",id:"ch20",geometry:{type:"Point",coordinates:[46.936652,142.752989]},properties:{name:"Спарта",level:"private",sportType:["gym","fitness"],phone:"+7 (4242) 24-34-44",email:"",website:"https://proriders.pro/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, Комсомольская ул., 259В (БЦ Столица, этаж цокольный)"}},
         {type:"Feature",id:"ch21",geometry:{type:"Point",coordinates:[46.953693,142.762960]},properties:{name:"Чемпион",level:"private",sportType:["snowboarding","Skiing"],phone:"+7 (4242) 44-41-81",email:"",website:"https://championsakh.com/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, Горнолыжная ул., 3"}},
+        {type:"Feature",id:"ch22",geometry:{type:"Point",coordinates:[46.979678,142.728909]},properties:{name:"Женский фитнес клуб Тонус",level:"private",sportType:["fitness"],phone:"+79841394539",email:"",website:"https://zhenskij-fitnes-klub-tonus-krajnjaja-ulitsa.clients.site/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Крайняя, 46"}},
+        {type:"Feature",id:"ch23",geometry:{type:"Point",coordinates:[46.979678,142.728909]},properties:{name:"Мега Фитнес",level:"private",sportType:["fitness","gym"],phone:"+7 (4242) 45-04-91",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Детская, 4"}},
+        {type:"Feature",id:"ch24",geometry:{type:"Point",coordinates:[46.959112,142.742451]},properties:{name:"Студия Энергии",level:"private",sportType:["fitness","yoga"],phone:"+7-900-668-50-93",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, Коммунистический пр., 31Б, 2 эт."}},
+        {type:"Feature",id:"ch25",geometry:{type:"Point",coordinates:[46.932215,142.734519]},properties:{name:"Do it",level:"private",sportType:["fitness"],phone:"+7‒924‒192‒63‒83",email:"",website:"do-it-fitness.ru",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Ленина, 395Б"}},
+        {type:"Feature",id:"ch26",geometry:{type:"Point",coordinates:[46.900017,142.742289]},properties:{name:"World Class",level:"private",sportType:["fitness","gym","pool"],phone:"+7 (4242) 797‒999",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​ТРК Сити Молл​2-я Центральная улица, 1Б"}},
+        {type:"Feature",id:"ch27",geometry:{type:"Point",coordinates:[46.970624,142.737457]},properties:{name:"Зеркала",level:"private",sportType:["fitness"],phone:"+7‒924‒197‒31‒05",email:"",website:"zerkala-sakhalin.ru",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​Проспект Мира, 58"}},
+        {type:"Feature",id:"ch28",geometry:{type:"Point",coordinates:[46.909454,142.752800]},properties:{name:"Зимний",level:"private",sportType:["fitness","gym"],phone:"+7 (4242) 55‒66‒50",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​​Улица Зимы, 77"}},
+        {type:"Feature",id:"ch29",geometry:{type:"Point",coordinates:[46.950691,142.754147]},properties:{name:"Нео Фитнес",level:"private",sportType:["fitness"],phone:"+7‒914‒088‒20‒90",email:"",website:"neo-fitness.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​Проспект Победы, 9Б"}},
+        {type:"Feature",id:"ch30",geometry:{type:"Point",coordinates:[46.944650,142.740170]},properties:{name:"Прайм",level:"private",sportType:["fitness","crossfit"],phone:"+7‒924‒880‒32‒99",email:"",website:"prime65_sakhalin.ru",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​Пограничная улица, 45 ст1"}},
+        {type:"Feature",id:"ch31",geometry:{type:"Point",coordinates:[46.924824,142.738265]},properties:{name:"Санрайз",level:"private",sportType:["yoga"],phone:"+7‒962‒127‒23‒12",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, Больничная улица, 76"}},
+        {type:"Feature",id:"ch32",geometry:{type:"Point",coordinates:[46.944650,142.740170]},properties:{name:"Da studio",level:"private",sportType:["fitness"],phone:"+7‒984‒139‒35‒55",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, Улица Комсомольская, 293а"}},
+        {type:"Feature",id:"ch33",geometry:{type:"Point",coordinates:[46.934270,142.753393]},properties:{name:"Elite fitness",level:"private",sportType:["fitness"],phone:"+7‒962‒127‒23‒15",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​Улица Комсомольская, 271 к2"}},
+        {type:"Feature",id:"ch34",geometry:{type:"Point",coordinates:[46.942017,142.753851]},properties:{name:"Йога дом",level:"private",sportType:["yoga"],phone:"+7‒914‒756‒66‒93",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​​Улица А.О. Емельянова, 11а"}},
+        {type:"Feature",id:"ch35",geometry:{type:"Point",coordinates:[46.935353,142.738463]},properties:{name:"Спорт и стиль",level:"private",sportType:["fitness"],phone:"+7‒962‒103‒29‒97",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​Улица М.А. Пуркаева, 102в"}},
+        {type:"Feature",id:"ch36",geometry:{type:"Point",coordinates:[46.944029,142.731582]},properties:{name:"Crossfit Phoenix",level:"private",sportType:["fitness"],phone:"+7‒924‒198‒95‒19",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​Пограничная улица, 57в"}},
+        {type:"Feature",id:"ch37",geometry:{type:"Point",coordinates:[46.939716,142.733819]},properties:{name:"СпортФит",level:"private",sportType:["fitness"],phone:"+7‒914‒746‒80‒62",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​Улица Ленина, 321/1"}},
+        {type:"Feature",id:"ch38",geometry:{type:"Point",coordinates:[46.951484,142.723560]},properties:{name:"Crossfit StandUp",level:"private",sportType:["fitness"],phone:"+7‒962‒417‒74‒42",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​Железнодорожная улица, 126Б"}},
+        {type:"Feature",id:"ch39",geometry:{type:"Point",coordinates:[46.953311,142.758235]},properties:{name:"Импульс",level:"private",sportType:["fitness"],phone:"7 (4242) 27‒97‒67",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​​Улица Алексея Максимовича Горького, 7/1"}},
+        {type:"Feature",id:"ch40",geometry:{type:"Point",coordinates:[46.902307,142.744239]},properties:{name:"Арена",level:"private",sportType:["fitness","gym"],phone:"+7 (4242) 24‒99‒99",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​Проспект Мира, 480"}},
+        {type:"Feature",id:"ch41",geometry:{type:"Point",coordinates:[46.908112,142.758136]},properties:{name:"Дельфин",level:"private",sportType:["fitness"],phone:"+7 (4242) 45‒07‒07",email:"",website:"www.strawberryhills.ru",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​Улица Солнечного света, 2"}},
+        {type:"Feature",id:"ch42",geometry:{type:"Point",coordinates:[47.008772,142.715520]},properties:{name:"Ритм",level:"private",sportType:["fitness"],phone:"+7‒914‒740‒53‒57",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​​Улица Дружбы, 2"}},
+        {type:"Feature",id:"ch43",geometry:{type:"Point",coordinates:[46.950691,142.739074]},properties:{name:"Универ",level:"private",sportType:["fitness","gym"],phone:"+7‒924‒885‒35‒55",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​​​Проспект Победы, 64"}},
+        {type:"Feature",id:"ch44",geometry:{type:"Point",coordinates:[46.979632,142.728905]},properties:{name:"Тонус",level:"private",sportType:["fitness","gym"],phone:"+7 (4242) 39‒45‒39",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ​​​​Улица Крайняя, 46"}},
+        {type:"Feature",id:"ch45",geometry:{type:"Point",coordinates:[46.966904,142.731681]},properties:{name:"Moosehead",level:"private",sportType:["fitness","gym"],phone:"+7 (4242) 45‒24‒24",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск,​ Милицейская улица, 8Б"}},
+        {type:"Feature",id:"ch46",geometry:{type:"Point",coordinates:[46.950340,142.736711]},properties:{name:"Джим",level:"private",sportType:["fitness","gym"],phone:"+7 (4242) 42‒42‒20",email:"",website:"rubin-hotel.ru",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск,​ ​Улица Чехова, 85"}},
+        {type:"Feature",id:"ch47",geometry:{type:"Point",coordinates:[46.968865,142.736325]},properties:{name:"Атлет",level:"private",sportType:["fitness","gym"],phone:"+7‒924‒282‒99‒09",email:"",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск,​ ​​Бумажная улица, 22а"}},
         // ===== ФЕДЕРАЦИИ (social) =====
         {type:"Feature",id:"s1",geometry:{type:"Point",coordinates:[46.942749,142.753698]},properties:{name:"Общественная региональная спортивная организация «Федерация бадминтона Сахалинской области»",level:"social",sportType:["badminton"],phone:"8-900-660-81-12",email:"serdol@mail.ru",website:"",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, ул. Емельянова, д. 11, кв. 46"}},
         {type:"Feature",id:"s2",geometry:{type:"Point",coordinates:[46.958164,142.730881]},properties:{name:"Сахалинская региональная общественная организация «Сахалинская федерация баскетбола»",level:"social",sportType:["basketball"],phone:"8-914-756-52-71",email:"sakhfb@yandex.ru",website:"https://sakhalin.russiabasket.ru/",websiteText:"Официальный сайт",address:"г. Южно-Сахалинск, пр. Коммунистический, д. 49, оф. 311"}},
@@ -666,6 +759,7 @@
                 const visibleOrgs = orgClusterer.getFilteredObjects();
                 document.getElementById('orgCount').innerText = `Найдено на карте: ${visibleOrgs ? visibleOrgs.features.length : 0}`;
                 document.getElementById('fedCount').innerText = federations.length;
+                // Список организаций обновляется отдельно
             } else {
                 const visibleObjects = objectClusterer.getFilteredObjects();
                 document.getElementById('objectCount').innerText = `Найдено объектов: ${visibleObjects ? visibleObjects.features.length : 0}`;
@@ -688,6 +782,8 @@
                 myMap.geoObjects.remove(objectClusterer);
                 myMap.geoObjects.add(orgClusterer);
                 updateCounts('orgs');
+                // Обновить список организаций при переключении
+                filterOrgs();
             } else {
                 objectFilters.classList.remove('hidden');
                 orgFilters.classList.add('hidden');
@@ -696,11 +792,49 @@
                 myMap.geoObjects.remove(orgClusterer);
                 myMap.geoObjects.add(objectClusterer);
                 updateCounts('objects');
+                // Очистить список организаций
+                document.getElementById('orgList').innerHTML = '';
             }
         }
 
         tabOrgs.addEventListener('click', () => switchTab('orgs'));
         tabObjects.addEventListener('click', () => switchTab('objects'));
+
+        // ---------- ФУНКЦИЯ ОТРИСОВКИ СПИСКА ОРГАНИЗАЦИЙ ----------
+        function renderOrganizationsList(orgs) {
+            const container = document.getElementById('orgList');
+            if (!orgs || orgs.length === 0) {
+                container.innerHTML = '<div style="color:#aaa; padding:4px 0; font-size:12px;">Нет организаций по заданным фильтрам</div>';
+                return;
+            }
+            let html = '';
+            orgs.forEach(org => {
+                const sportTags = org.sports.map(s => `<span>${SPORT_TYPES[s] || s}</span>`).join('');
+                const phoneLink = org.phone && org.phone !== '—' ? `<a href="tel:${org.phone.replace(/[^0-9+]/g, '')}">${org.phone}</a>` : org.phone;
+                html += `
+                    <div class="org-list-item" data-id="${org.id}">
+                        <div class="org-name">${org.name}</div>
+                        <div class="org-address">${org.address}</div>
+                        <div class="org-phone">📞 ${phoneLink}</div>
+                        <div class="org-sports">${sportTags}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            // При клике на элемент центрируем карту на соответствующей метке
+            container.querySelectorAll('.org-list-item').forEach(el => {
+                el.addEventListener('click', function() {
+                    const orgId = this.dataset.id;
+                    const placemark = orgPlacemarks.find(pm => pm.properties.get('orgData').id === orgId);
+                    if (placemark) {
+                        const coords = placemark.geometry.getCoordinates();
+                        myMap.setCenter(coords, 15, { duration: 300 });
+                        placemark.balloon.open();
+                    }
+                });
+            });
+        }
 
         // ---------- ФИЛЬТРЫ ОРГАНИЗАЦИЙ ----------
         const levelSelect = document.getElementById('levelFilter');
@@ -737,6 +871,7 @@
         }
 
         function filterOrgs() {
+            if (currentTab !== 'orgs') return;
             const selectedType = levelSelect.value;
             const selectedSport = sportSelect.value;
             const searchLower = currentSearchText.toLowerCase();
@@ -753,6 +888,11 @@
             orgClusterer.add(filteredOrgs);
             document.getElementById('orgCount').innerText = `Найдено на карте: ${filteredOrgs.length}`;
 
+            // Отрисовываем список организаций
+            const orgDataList = filteredOrgs.map(pm => pm.properties.get('orgData'));
+            renderOrganizationsList(orgDataList);
+
+            // Фильтр федераций
             const filteredFeds = federations.filter(fed => {
                 const nameMatch = fed.name.toLowerCase().includes(searchLower);
                 const sportMatch = selectedSport === 'all' || fed.sports.includes(selectedSport);
@@ -867,18 +1007,15 @@
         populateObjectSportFilter();
         renderFederationsList(federations);
         document.getElementById('fedCount').innerText = federations.length;
-        updateCounts('orgs');
+        // Первичный рендер списка организаций (все)
+        setTimeout(() => {
+            filterOrgs();
+        }, 100);
 
-        // ---------- БУРГЕР-КНОПКА: обработчик уже назначен выше, но дублируем здесь на всякий случай (для совместимости) ----------
+        // ---------- БУРГЕР-КНОПКА ----------
         const toggleBtn = document.getElementById('togglePanelBtn');
         const panel = document.getElementById('mainPanel');
-        // Проверяем, не назначен ли уже обработчик (чтобы не дублировать)
         if (toggleBtn && panel) {
-            // Удаляем старый обработчик, если он был, чтобы не было дублирования
-            // В данном случае мы уже назначили через DOMContentLoaded, поэтому здесь просто проверим.
-            // Если обработчик ещё не назначен, назначим его.
-            // Но мы уже назначили его выше, так что ничего не делаем.
-            // Однако на случай, если DOMContentLoaded не сработал, продублируем:
             if (!toggleBtn._listenerAdded) {
                 toggleBtn.addEventListener('click', function(e) {
                     e.preventDefault();
